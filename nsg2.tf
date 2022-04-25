@@ -1,6 +1,6 @@
 module "NSG_VM" {
-  source    = "app.terraform.io/roman2025/NSG/azurerm"
-  version = "0.0.3"
+  source    = "github.com/dev-headaches/terraform-azurerm-NSG"
+  #version = "0.0.3"
   nsgname   = format("%s%s%s%s", "nsg_vm_snet", var.orgname, var.enviro, var.prjnum)
   location  = var.location
   rgname    = lookup(module.hub_rg.rgnames, "NetSec", "fail")
@@ -10,8 +10,8 @@ module "NSG_VM" {
 ####
 
 module "NSG_INT_RULE_ALLOW-TO-INTERNET-OUTBOUND" {
-  source                   = "app.terraform.io/roman2025/nsgrule2/azurerm"
-  version = "0.0.1"
+  source                   = "github.com/dev-headaches/terraform-azurerm-nsgrule2"
+  #version = "0.0.1"
   name                     = "ALLOW-TO-INTERNET-OUTBOUND"
   priority                 = 3800
   direction                = "Outbound"

@@ -1,12 +1,12 @@
 terraform {
   required_providers {
     azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 2.12"
+      source  = "hashicorp"
+      #version = "~> 2.12"
     }
     random = {
       source  = "hashicorp/random"
-      version = "~> 2.3.0"
+      #version = "~> 2.3.0"
     }
   }
 }
@@ -18,8 +18,8 @@ locals {
 }
 
 module "hub_rg" {
-  source  = "app.terraform.io/roman2025/rg/azurerm"
-  version = "0.0.3"
+  source  = "github.com/dev-headaches/terraform-azurerm-rg"
+  #version = "0.0.3"
   resource_groups = local.resource_groups
   prefix    = "rg_hub"
   orgname   = var.orgname
@@ -29,8 +29,8 @@ module "hub_rg" {
 }
 
 module "hub_firewall" {
-  source                            = "app.terraform.io/roman2025/firewall/azurerm"
-  version = "0.0.2"
+  source                            = "github.com/dev-headaches/terraform-azurerm-firewall"
+  #version = "0.0.2"
   firewall_name                     = format("%s%s%s%s", "fw_hub_", var.orgname, var.enviro, var.prjnum)
   enviro                            = var.enviro
   fwsku                             = "Premium"
@@ -47,8 +47,8 @@ module "hub_firewall" {
 }
 
 module "hub_law" {
-  source           = "app.terraform.io/roman2025/law/azurerm"
-  version = "0.0.1"
+  source           = "github.com/dev-headaches/terraform-azurerm-law"
+  #version = "0.0.1"
   wsname           = format("%s%s%s%s", "law-hub-", var.orgname, var.enviro, var.prjnum)
   rgname           = lookup(module.hub_rg.rgnames, "Security", "fail")
   location         = var.location
@@ -57,8 +57,8 @@ module "hub_law" {
 }
 
 module "FirewallRuleCollectionGroup" {
-  source     = "app.terraform.io/roman2025/morph_hub_azfw_rcg/azurerm"
-  version = "0.0.1"
+  source     = "github.com/dev-headaches/terraform-azurerm-morph_hub_azfw_rcg"
+  #version = "0.0.1"
   enviro     = var.enviro
   orgname    = var.orgname
   prjnum     = var.prjnum
@@ -68,8 +68,8 @@ module "FirewallRuleCollectionGroup" {
 }
 
 module "hub_bastion" {
-  source                = "app.terraform.io/roman2025/bastion/azurerm"
-  version = "0.0.2"
+  source                = "github.com/dev-headaches/terraform-azurerm-bastion"
+  #version = "0.0.2"
   name                  = "hub"
   enviro                = var.enviro
   orgname               = var.orgname

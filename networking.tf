@@ -1,6 +1,6 @@
 module "vnet_hub" {
-  source   = "app.terraform.io/roman2025/vnet/azurerm"
-  version = "0.0.1"
+  source   = "github.com/dev-headaches/terraform-azurerm-vnet"
+  #version = "0.0.1"
   enviro   = var.enviro
   name     =  "hub"
   prjnum   = var.prjnum
@@ -12,8 +12,8 @@ module "vnet_hub" {
 }
 
 module "bastion_public_ip" {
-  source   = "app.terraform.io/roman2025/pip/azurerm"
-  version = "0.0.2"
+  source   = "github.com/dev-headaches/terraform-azurerm-pip"
+  #version = "0.0.2"
   enviro   = var.enviro
   name     = "bast"
   prjnum   = var.prjnum
@@ -25,8 +25,8 @@ module "bastion_public_ip" {
 }
 
 module "azfw_subnet" {
-  source   = "app.terraform.io/roman2025/subnet/azurerm"
-  version = "0.0.1"
+  source   = "github.com/dev-headaches/terraform-azurerm-subnet"
+  #version = "0.0.1"
   name     = "AzureFirewallSubnet"
   rgname   = lookup(module.hub_rg.rgnames, "Connectivity", "fail")
   virtual_network_name = module.vnet_hub.vnet_name
@@ -35,8 +35,8 @@ module "azfw_subnet" {
 }
 
 module "bastion_subnet" {
-  source   = "app.terraform.io/roman2025/subnet/azurerm"
-  version = "0.0.1"
+  source   = "github.com/dev-headaches/terraform-azurerm-subnet"
+  #version = "0.0.1"
   name     = "AzureBastionSubnet"
   rgname   = lookup(module.hub_rg.rgnames, "Connectivity", "fail")
   virtual_network_name = module.vnet_hub.vnet_name
@@ -45,8 +45,8 @@ module "bastion_subnet" {
 }
 
 module "gateway_subnet" {
-  source   = "app.terraform.io/roman2025/subnet/azurerm"
-  version = "0.0.1"
+  source   = "github.com/dev-headaches/terraform-azurerm-subnet"
+  #version = "0.0.1"
   name     = "GatewaySubnet"
   rgname   = lookup(module.hub_rg.rgnames, "Connectivity", "fail")
   virtual_network_name = module.vnet_hub.vnet_name
@@ -55,8 +55,8 @@ module "gateway_subnet" {
 }
 
 module "vm_subnet" {
-  source   = "app.terraform.io/roman2025/subnet/azurerm"
-  version = "0.0.1"
+  source   = "github.com/dev-headaches/terraform-azurerm-subnet"
+  #version = "0.0.1"
   name     = "snet_vm"
   rgname   = lookup(module.hub_rg.rgnames, "Connectivity", "fail")
   virtual_network_name = module.vnet_hub.vnet_name
@@ -65,8 +65,8 @@ module "vm_subnet" {
 }
 
 module "azfw_public_ip" {
-  source   = "app.terraform.io/roman2025/pip/azurerm"
-  version = "0.0.2"
+  source   = "github.com/dev-headaches/terraform-azurerm-pip"
+  #version = "0.0.2"
   enviro   = var.enviro
   name     = "azfw"
   prjnum   = var.prjnum
@@ -78,8 +78,8 @@ module "azfw_public_ip" {
 }
 
 module "azfw_hub_gateway_routetable" {
-  source           = "app.terraform.io/roman2025/routetable/azurerm"
-  version = "0.0.1"
+  source           = "github.com/dev-headaches/terraform-azurerm-routetable"
+  #version = "0.0.1"
   tablename        = format("%s%s%s%s%s", "rt_table_snet_hub_gateway", var.orgname, var.enviro, "_", var.prjnum)
   location         = var.location
   rgname           = lookup(module.hub_rg.rgnames, "Connectivity", "fail")
@@ -88,8 +88,8 @@ module "azfw_hub_gateway_routetable" {
 }
 
 module "azfw_hub_gateway_route" {
-  source                         = "app.terraform.io/roman2025/route/azurerm"
-  version = "0.0.1"
+  source                         = "github.com/dev-headaches/terraform-azurerm-route"
+  #version = "0.0.1"
   routename                      = format("%s%s%s%s%s", "rt_azfw_default_", var.orgname, var.enviro, "_", var.prjnum)
   rgname                         = lookup(module.hub_rg.rgnames, "Connectivity", "fail")
   address_prefix                 = "192.168.50.0/24"
@@ -99,8 +99,8 @@ module "azfw_hub_gateway_route" {
 }
 
 module "routetable_snet_vm" {
-  source              = "app.terraform.io/roman2025/routetable/azurerm"
-  version = "0.0.1"
+  source              = "github.com/dev-headaches/terraform-azurerm-routetable"
+  #version = "0.0.1"
   tablename           = format("%s%s%s%s%s", "rt_table_snet_vm_", var.orgname, var.enviro, "_", var.prjnum)
   location            = var.location
   rgname              = lookup(module.hub_rg.rgnames, "Connectivity", "fail")
@@ -109,8 +109,8 @@ module "routetable_snet_vm" {
 }
 
 module "route_azfw_default_from_snet_vm" {
-  source              = "app.terraform.io/roman2025/route/azurerm"
-  version = "0.0.1"
+  source              = "github.com/dev-headaches/terraform-azurerm-route"
+  #version = "0.0.1"
   routename           = format("%s%s%s%s%s", "rt_azfw_default_from_snet_vm_", var.orgname, var.enviro, "_", var.prjnum)
   rgname              = lookup(module.hub_rg.rgnames, "Connectivity", "fail")
   next_hop_ip_address = module.hub_firewall.fw_private_ip_address

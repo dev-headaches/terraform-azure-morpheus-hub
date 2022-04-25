@@ -1,6 +1,6 @@
 module "kv_vmsecrets" {
-  source        = "app.terraform.io/roman2025/kv/azurerm"
-  version = "0.0.4"
+  source        = "github.com/dev-headaches/terraform-azurerm-kv"
+  #version = "0.0.4"
   keyvault_name = "vmsecrets"
   enviro        = var.enviro
   prjnum        = var.prjnum

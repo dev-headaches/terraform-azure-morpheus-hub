@@ -18,7 +18,7 @@ variable "location" {
 
 variable "orgname" {
   type        = string
-  default     = "tcld"
+  default     = "clds"
 }
 
 variable "vnet_hub_address_spaces" {

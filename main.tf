@@ -28,22 +28,61 @@ module "hub_rg" {
   location  = var.location
 }
 
+resource "azurerm_firewall_policy" "firewall_policy" {
+  name                = format("%s%s%s%s", "fwp_hub_", var.orgname, var.enviro, var.prjnum)
+  resource_group_name = lookup(module.hub_rg.rgnames, "Connectivity", "fail")
+  location            = var.location
+  sku                 = "Premium"
+  dns {
+    proxy_enabled = "true"
+    servers        = ["8.8.8.8"]
+  }
+  threat_intelligence_mode = "Alert"
+  threat_intelligence_allowlist {
+  ip_addresses = ["8.8.8.8", "1.1.1.1"]
+  fqdns        = ["www.google.com", "saic.com"]
+  }
+
+  intrusion_detection {
+    mode = "Alert"
+  }
+}
+
+module "FirewallRuleCollectionGroup" {
+  source     = "github.com/dev-headaches/terraform-azurerm-morph_hub_azfw_rcg"
+  #version = "0.0.1"
+  enviro     = var.enviro
+  orgname    = var.orgname
+  prjnum     = var.prjnum
+  fwp_hub_id = azurerm_firewall_policy.firewall_policy.id
+  web_categories_blacklist = var.web_categories_blacklist
+  fqdnblacklist     = var.fqdnblacklist
+}
+
 module "hub_firewall" {
   source                            = "github.com/dev-headaches/terraform-azurerm-firewall"
+  ## Adding new dependencies below to hopefully enforce proper creation order and waiting
+  depends_on = [
+    azurerm_firewall_policy.firewall_policy,
+    module.FirewallRuleCollectionGroup,
+    module.azfw_public_ip,
+    module.azfw_subnet
+  ]
   #version = "0.0.2"
   firewall_name                     = format("%s%s%s%s", "fw_hub_", var.orgname, var.enviro, var.prjnum)
-  enviro                            = var.enviro
-  fwsku                             = "Premium"
-  prjnum                            = var.prjnum
-  orgname                           = var.orgname
   location                          = var.location
   rgname                            = lookup(module.hub_rg.rgnames, "Connectivity", "fail")
-  AzureFirewall_Public_IP_ID        = module.azfw_public_ip.public_ip_id
   AzureFirewallSubnet_ID            = module.azfw_subnet.subnet_id
-  dns_servers                       = ["8.8.8.8"]
-  ThreatIntelligence_Mode           = "Alert"
-  ThreatIntelligence_IP_Whitelist   = ["8.8.8.8", "1.1.1.1"]
-  ThreatIntelligence_FQDN_Whitelist = ["www.google.com", "kiloroot.com"]
+  AzureFirewall_Public_IP_ID        = module.azfw_public_ip.public_ip_id
+  fwsku                             = "Premium"
+  firewall_policy_id                = azurerm_firewall_policy.firewall_policy.id      ## NEW INPUT BECAUSE WE MOVED POLICY OUT
+  #enviro                            = var.enviro
+  #prjnum                            = var.prjnum
+  #orgname                           = var.orgname
+  #dns_servers                       = ["8.8.8.8"]
+  #ThreatIntelligence_Mode           = "Alert"
+  #ThreatIntelligence_IP_Whitelist   = ["8.8.8.8", "1.1.1.1"]
+  #ThreatIntelligence_FQDN_Whitelist = ["www.google.com", "kiloroot.com"]
 }
 
 module "hub_law" {
@@ -54,17 +93,6 @@ module "hub_law" {
   location         = var.location
   lawSKU           = "PerGB2018"
   logRetentionDays = 30
-}
-
-module "FirewallRuleCollectionGroup" {
-  source     = "github.com/dev-headaches/terraform-azurerm-morph_hub_azfw_rcg"
-  #version = "0.0.1"
-  enviro     = var.enviro
-  orgname    = var.orgname
-  prjnum     = var.prjnum
-  fwp_hub_id = module.hub_firewall.fwp_id
-  web_categories_blacklist = var.web_categories_blacklist
-  fqdnblacklist     = var.fqdnblacklist
 }
 
 module "hub_bastion" {

@@ -8,7 +8,7 @@ output "vnet_hub_id" {
 }
 
 output "fwp_hub_id" {
-  value       = module.hub_firewall.fwp_id
+  value       = azurerm_firewall_policy.firewall_policy.id
   description = "the resource id of the hub firewall policy"
 }
 
